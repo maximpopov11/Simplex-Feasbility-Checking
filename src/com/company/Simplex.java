@@ -83,11 +83,4 @@ public class Simplex {
 
     }
 
-    //Questions:
-    /**
-     * Would it be better to use an array of tuples instead of 2-d array for inequalities to not write 0's for those with few variables?
-     * Would an ArrayList of arrays be better for inequalities? No space used for 0's in data but ArrayList functionalities not needed.
-     * Would it be preferable to have an array of relationships (index in array defines which inequality) rather than integer representation? I think array of relationships would be clearer.
-     */
-
 }
