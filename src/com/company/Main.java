@@ -54,7 +54,9 @@ public class Main {
      *             ~
      *             ~: when finished with initial inequalities
      */
-    public void main(String[] args) {
+    public static void main(String[] args) {
+
+        testSimplex();
 
         //Holds args as fields
         //If args specify random args call random
@@ -62,8 +64,20 @@ public class Main {
         //Calls each (each returns its time)
         //Print times
 
-        initializeFields(args);
+        //initializeFields(args);
         //todo: run
+
+    }
+
+    private static void testSimplex() {
+
+        LinearConstraint[] constraints = new LinearConstraint[4];
+        constraints[0] = new LinearConstraint(new double[] { 3, 5 }, Relationship.LEQ, 78);
+        constraints[1] = new LinearConstraint(new double[] { 4, 1 }, Relationship.LEQ, 36);
+        constraints[2] = new LinearConstraint(new double[] { 1, 0 }, Relationship.GEQ, 0);
+        constraints[3] = new LinearConstraint(new double[] { 0, 1 }, Relationship.GEQ, 0);
+        Simplex simplex = new Simplex(new double[]{5, 4}, 0, constraints, constraints.length);
+        simplex.run();
 
     }
 

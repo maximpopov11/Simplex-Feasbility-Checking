@@ -4,6 +4,8 @@ import org.apache.commons.math3.exception.TooManyIterationsException;
 import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.linear.*;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
+
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class Simplex {
@@ -19,24 +21,24 @@ public class Simplex {
     double constant;
 
     /**
-     * Constraints for simplex (initially consisting of just initial constraints, then consisitng of all constrains at the end).
+     * Constraints for simplex (starting with some and building up to all).
      */
-    Collection<LinearConstraint> constraints;
+    LinearConstraint[] constraints;
 
     /**
-     * Additional constraints for simplex to add one by one.
+     * Number of constraints to start with.
      */
-    LinearConstraint[] additionalConstraints;
+    int startingConstraints;
 
-        /**
-         * Initializes fields.
-         */
-    public Simplex(double[] coefficients, double constant, Collection<LinearConstraint> initialConstraints, LinearConstraint[] additionalConstraints) {
+    /**
+     * Initializes fields.
+     */
+    public Simplex(double[] coefficients, double constant, LinearConstraint[] constraints, int startingConstraints) {
 
         this.coefficients = coefficients;
         this.constant = constant;
-        this.constraints = initialConstraints;
-        this.additionalConstraints = additionalConstraints;
+        this.constraints = constraints;
+        this.startingConstraints = startingConstraints;
 
     }
 
@@ -47,39 +49,76 @@ public class Simplex {
     public long run() {
 
         long startTime = System.currentTimeMillis();
-        //Runs simplex for each additional inequality (+0, +1, +2, ...), does not save result
-        for (int i = -1; i < additionalConstraints.length; i++) {
-            if (i >= 0) {
-                for (int j = 0; j <= i; j++) {
-                    constraints.add(additionalConstraints[j]);
-                }
-            }
-            LinearObjectiveFunction simplex = new LinearObjectiveFunction(coefficients, constant);
-            PointValuePair solution = null;
-            try {
-                solution = new SimplexSolver().optimize(simplex, new LinearConstraintSet(constraints), GoalType.MAXIMIZE);
-            } catch (TooManyIterationsException e) { // ?
-                System.out.println("result1: TooManyIterations");
-            } catch (NoFeasibleSolutionException e) {
-                System.out.println("result1: NoFeasibleSolution");
-            } catch (UnboundedSolutionException e) {
-                System.out.println("result1: UnboundedSolution");
-            }
-            //Prints solution
-            if (solution != null) {
-                // get solution
-                double max = solution.getValue();
-                System.out.println("Opt: " + max);
-                // print decision variables
-                for (int j = 0; j < 2; j++) {
-                    System.out.print(solution.getPoint()[j] + "\t");
-                }
-            } else {
-                System.out.println("no solution");
-            }
+        Collection<LinearConstraint> currentConstraints = new ArrayList<>();
+        for (int i = 0; i < startingConstraints; i++) {
+            currentConstraints.add(constraints[i]);
+        }
+        runInstance(currentConstraints);
+        //Runs simplex for each additional inequality (+1, +2, ...), does not save result
+        for (int i = startingConstraints; i < constraints.length; i++) {
+            currentConstraints.add(constraints[i]);
+            runInstance(currentConstraints);
         }
         long endTime = System.currentTimeMillis();
         return endTime - startTime;
+
+    }
+
+    /**
+     * Runs an instance of Simplex upon one set of inequalities
+     * @param currentConstraints are the inequalities
+     */
+    private void runInstance(Collection<LinearConstraint> currentConstraints) {
+
+        LinearObjectiveFunction simplex = new LinearObjectiveFunction(coefficients, constant);
+        PointValuePair solution = null;
+
+        //max
+        try {
+            solution = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MAXIMIZE);
+        } catch (TooManyIterationsException e) { // ?
+            System.out.println("result1: TooManyIterations");
+        } catch (NoFeasibleSolutionException e) {
+            System.out.println("result1: NoFeasibleSolution");
+        } catch (UnboundedSolutionException e) {
+            System.out.println("result1: UnboundedSolution");
+        }
+        System.out.print("Max: ");
+        printSolution(solution);
+
+        //min
+        try {
+            solution = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MINIMIZE);
+        } catch (TooManyIterationsException e) { // ?
+            System.out.println("result1: TooManyIterations");
+        } catch (NoFeasibleSolutionException e) {
+            System.out.println("result1: NoFeasibleSolution");
+        } catch (UnboundedSolutionException e) {
+            System.out.println("result1: UnboundedSolution");
+        }
+        System.out.print("Min: ");
+        printSolution(solution);
+
+    }
+
+    /**
+     * Prints simplex solution
+     * @param solution to print
+     */
+    private void printSolution(PointValuePair solution) {
+
+        if (solution != null) {
+            // get solution
+            double max = solution.getValue();
+            System.out.println(max);
+            // print decision variables
+            for (int j = 0; j < 2; j++) {
+                System.out.print(solution.getPoint()[j] + "\t");
+            }
+            System.out.println();
+        } else {
+            System.out.println("no max solution");
+        }
 
     }
 
