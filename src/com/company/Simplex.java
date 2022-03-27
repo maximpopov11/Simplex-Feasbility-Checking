@@ -33,12 +33,12 @@ public class Simplex {
     /**
      * Initializes fields.
      */
-    public Simplex(double[] coefficients, double constant, LinearConstraint[] constraints, int startingConstraints) {
+    public Simplex(double[] coefficients, double constant, int numStartingConstraints, LinearConstraint[] constraints) {
 
         this.coefficients = coefficients;
         this.constant = constant;
+        this.startingConstraints = numStartingConstraints;
         this.constraints = constraints;
-        this.startingConstraints = startingConstraints;
 
     }
 

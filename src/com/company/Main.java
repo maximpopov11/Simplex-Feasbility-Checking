@@ -20,23 +20,24 @@ public class Main {
     /**
      * Coefficients for target function variables
      */
-    double[] coefficients;
+    static double[] coefficients;
 
     /**
      * Constant for target function.
      */
-    double constant;
+    static double constant;
+
+    /**
+     * Number of constraints to be used initially
+     */
+    static int numInitialConstraints;
 
     /**
      * Constraints for simplex (initially consisting of just initial constraints, then consisitng of all constrains at the end).
      */
-    Collection<LinearConstraint> constraints;
+    static LinearConstraint[] constraints;
 
-    /**
-     * Additional constraints for simplex to add one by one.
-     */
-    LinearConstraint[] additionalConstraints;
-
+    //todo: correct info below
     /**
      * Given args runs and compares
      * If args starts with "random" followed by number of variables and number of inequalities, inequalities are created randomly
@@ -56,7 +57,12 @@ public class Main {
      */
     public static void main(String[] args) {
 
-        testSimplex();
+        initializeFields(args);
+        Simplex simplex = new Simplex(coefficients, constant, numInitialConstraints, constraints);
+        simplex.run();
+
+        //hardcoded simplex
+//        testSimplex();
 
         //Holds args as fields
         //If args specify random args call random
@@ -64,24 +70,9 @@ public class Main {
         //Calls each (each returns its time)
         //Print times
 
-        //initializeFields(args);
-        //todo: run
-
     }
 
-    private static void testSimplex() {
-
-        LinearConstraint[] constraints = new LinearConstraint[4];
-        constraints[0] = new LinearConstraint(new double[] { 3, 5 }, Relationship.LEQ, 78);
-        constraints[1] = new LinearConstraint(new double[] { 4, 1 }, Relationship.LEQ, 36);
-        constraints[2] = new LinearConstraint(new double[] { 1, 0 }, Relationship.GEQ, 0);
-        constraints[3] = new LinearConstraint(new double[] { 0, 1 }, Relationship.GEQ, 0);
-        Simplex simplex = new Simplex(new double[]{5, 4}, 0, constraints, constraints.length);
-        simplex.run();
-
-    }
-
-    private void initializeFields(String[] args) {
+    private static void initializeFields(String[] args) {
 
         //randomly generated args
         if (args[0].equals("random")) {
@@ -90,31 +81,73 @@ public class Main {
         //given args
         else {
             //num coefficients
-            this.coefficients = new double[Integer.parseInt(args[0])];
-            int i = 1;
+            coefficients = new double[Integer.parseInt(args[0])];
+            int index = 1;
             //initialize coefficients
-            while (!args[i].equals("~")) {
-                coefficients[i - 1] = Double.parseDouble(args[i]);
-                i++;
+            while (!args[index].equals("~")) {
+                coefficients[index - 1] = Double.parseDouble(args[index]);
+                index++;
             }
             //skip "~"
-            i++;
+            index++;
             //initialize constant
-            this.constant = Double.parseDouble(args[i]);
-            //initialize initial constraints
-            i++;
-            this.constraints = new ArrayList<LinearConstraint>();
-            String input = args[i];
-            while (!input.equals("~")) {
-
-                i++;
+            constant = Double.parseDouble(args[index]);
+            index++;
+            int numConstraints = Integer.parseInt(args[index]);
+            index++;
+            //initialize numInitialConstraints
+            numInitialConstraints = Integer.parseInt(args[index]);
+            index++;
+            //initialize constraints
+            constraints = new LinearConstraint[numConstraints];
+            int constraintIndex = 0;
+            while (index < args.length) {
+                int numCoefficients = Integer.parseInt(args[index]);
+                index++;
+                double[] coefficients = new double[numCoefficients];
+                for (int i = 0; i < coefficients.length; i++, index++) {
+                    coefficients[i] = Double.parseDouble(args[index]);
+                }
+                String relationshipString = args[index];
+                Relationship relationship;
+                if (relationshipString.equals("EQ")) {
+                    relationship = Relationship.EQ;
+                }
+                else if (relationshipString.equals("LEQ")) {
+                    relationship = Relationship.LEQ;
+                }
+                else if (relationshipString.equals("GEQ")) {
+                    relationship = Relationship.GEQ;
+                }
+                else {
+                    throw new IllegalArgumentException("Provided relationship is not valid (must be EQ, LEQ, or GEQ).");
+                }
+                index++;
+                double value = Double.parseDouble(args[index]);
+                index++;
+                constraints[constraintIndex] = new LinearConstraint(coefficients, relationship, value);
+                constraintIndex++;
             }
 
-            //todo: do we need initial/additional inequalities? Would it not just be inequalities originally, taking first 0, then 1, ...?
             //todo: what if no constraints
             //todo: what if no additional constraints
             //todo: example input
         }
+
+    }
+
+    /**
+     * Hardcoded simplex test
+     */
+    private static void testSimplex() {
+
+        LinearConstraint[] constraints = new LinearConstraint[4];
+        constraints[0] = new LinearConstraint(new double[] { 3, 5 }, Relationship.LEQ, 78);
+        constraints[1] = new LinearConstraint(new double[] { 4, 1 }, Relationship.LEQ, 36);
+        constraints[2] = new LinearConstraint(new double[] { 1, 0 }, Relationship.GEQ, 0);
+        constraints[3] = new LinearConstraint(new double[] { 0, 1 }, Relationship.GEQ, 0);
+        Simplex simplex = new Simplex(new double[]{5, 4}, 0, constraints.length, constraints);
+        simplex.run();
 
     }
 
