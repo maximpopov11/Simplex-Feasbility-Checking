@@ -10,11 +10,12 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../ISU/Research/Simplex/libraries/commons-math3-3.6.1.jar!/" />
+          <root url="jar://$USER_HOME$/ISU/Research/Simplex/libraries/commons-math3-3.6.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="commons-math3-3.6.1" level="project" />
   </component>
 </module>

@@ -37,23 +37,21 @@ public class Main {
      */
     static LinearConstraint[] constraints;
 
-    //todo: correct info below
     /**
      * Given args runs and compares
      * If args starts with "random" followed by number of variables and number of inequalities, inequalities are created randomly
-     * @param args target function consisting of the following: (seperated by " ")
+     * @param args target function consisting of the following (each value seperated by a space):
      *             int: number of coefficients in target function
      *             ints separated by spaces: coefficients in target function
      *             ~
      *             int: constant in target function
-     *        while not inputting "~ ~"
+     *             int: number of constraints
+     *             int: number of initial constraints
      *             ints separated by spaces: coefficients in inequality
-     *             ~
-     *             inequality in 2 letters: GT (>), GE (>=), ET (=), LE (<=), LT (<)
-     *             ~
-     *             int: constant in inequality
-     *             ~
-     *             ~: when finished with initial inequalities
+     *             constraints in the following format:
+     *              int: number of coefficients
+     *              ints separated by spaces: coefficients in constraint function
+     *              String: inequality (EQ, LEQ, or GEQ)
      */
     public static void main(String[] args) {
 
