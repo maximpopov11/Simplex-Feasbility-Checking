@@ -1,19 +1,7 @@
 package com.company;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-
-import org.apache.commons.math3.exception.TooManyIterationsException;
-import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.linear.LinearConstraint;
-import org.apache.commons.math3.optim.linear.LinearConstraintSet;
-import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
-import org.apache.commons.math3.optim.linear.NoFeasibleSolutionException;
 import org.apache.commons.math3.optim.linear.Relationship;
-import org.apache.commons.math3.optim.linear.SimplexSolver;
-import org.apache.commons.math3.optim.linear.UnboundedSolutionException;
-import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 
 public class Main {
 
@@ -33,14 +21,14 @@ public class Main {
     static int numInitialConstraints;
 
     /**
-     * Constraints for simplex (initially consisting of just initial constraints, then consisitng of all constrains at the end).
+     * Constraints for simplex (initially consisting of just initial constraints, then consisting of all constrains at the end).
      */
     static LinearConstraint[] constraints;
 
     /**
      * Given args runs and compares
      * If args starts with "random" followed by number of variables and number of inequalities, inequalities are created randomly
-     * @param args target function consisting of the following (each value seperated by a space):
+     * @param args target function consisting of the following (each value separated by a space):
      *             int: number of coefficients in target function
      *             ints separated by spaces: coefficients in target function
      *             ~
@@ -108,17 +96,18 @@ public class Main {
                 }
                 String relationshipString = args[index];
                 Relationship relationship;
-                if (relationshipString.equals("EQ")) {
-                    relationship = Relationship.EQ;
-                }
-                else if (relationshipString.equals("LEQ")) {
-                    relationship = Relationship.LEQ;
-                }
-                else if (relationshipString.equals("GEQ")) {
-                    relationship = Relationship.GEQ;
-                }
-                else {
-                    throw new IllegalArgumentException("Provided relationship is not valid (must be EQ, LEQ, or GEQ).");
+                switch (relationshipString) {
+                    case "EQ":
+                        relationship = Relationship.EQ;
+                        break;
+                    case "LEQ":
+                        relationship = Relationship.LEQ;
+                        break;
+                    case "GEQ":
+                        relationship = Relationship.GEQ;
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Provided relationship is not valid (must be EQ, LEQ, or GEQ).");
                 }
                 index++;
                 double value = Double.parseDouble(args[index]);
@@ -159,14 +148,5 @@ public class Main {
         //input inequality information into fields
 
     }
-
-    //Questions:
-    /**
-     * How many times should the Simplexes be tested over the same data for average results minimizing outside activity?
-     * Do we need the result of Simplex or only the time? (I will still create a result function for tests)
-     * Is there a way to ensure creation of "good" random inequalities (those that can potentially have +/-)?
-     * Should I limit inequalities to not always have all variables with non-0 coefficients?
-     * Should I add inputs from a file?
-     */
 
 }
