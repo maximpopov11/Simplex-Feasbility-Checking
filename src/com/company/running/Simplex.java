@@ -1,4 +1,4 @@
-package com.company;
+package com.company.running;
 
 import org.apache.commons.math3.exception.TooManyIterationsException;
 import org.apache.commons.math3.optim.PointValuePair;

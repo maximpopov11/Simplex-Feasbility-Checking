@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.apache.commons.math3.Field;
 import org.apache.commons.math3.RealFieldElement;
-import org.apache.commons.math3.linear.Array2DRowFieldMatrix;
 import org.apache.commons.math3.linear.ArrayFieldVector;
 import org.apache.commons.math3.linear.FieldDecompositionSolver;
 import org.apache.commons.math3.linear.FieldLUDecomposition;

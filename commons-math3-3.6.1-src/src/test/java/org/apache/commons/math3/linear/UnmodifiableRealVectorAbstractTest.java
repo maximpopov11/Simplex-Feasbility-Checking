@@ -26,7 +26,6 @@ import java.util.Random;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.function.Sin;
 import org.apache.commons.math3.exception.MathUnsupportedOperationException;
-import org.apache.commons.math3.linear.RealVector.Entry;
 import org.apache.commons.math3.util.FastMath;
 import org.junit.Assert;
 import org.junit.Test;

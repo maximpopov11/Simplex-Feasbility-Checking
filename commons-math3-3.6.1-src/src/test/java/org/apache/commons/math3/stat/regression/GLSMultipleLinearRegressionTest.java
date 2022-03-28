@@ -21,8 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.apache.commons.math3.TestUtils;
 import org.apache.commons.math3.linear.MatrixUtils;
-import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
 import org.apache.commons.math3.random.CorrelatedRandomVectorGenerator;
 import org.apache.commons.math3.random.JDKRandomGenerator;
 import org.apache.commons.math3.random.GaussianRandomGenerator;

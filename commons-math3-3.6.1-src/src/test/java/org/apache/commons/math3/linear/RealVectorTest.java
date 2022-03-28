@@ -19,7 +19,6 @@ package org.apache.commons.math3.linear;
 
 import java.util.Iterator;
 
-import org.apache.commons.math3.linear.RealVector.Entry;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

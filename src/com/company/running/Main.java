@@ -1,4 +1,4 @@
-package com.company;
+package com.company.running;
 
 import org.apache.commons.math3.optim.linear.LinearConstraint;
 import org.apache.commons.math3.optim.linear.Relationship;
@@ -128,7 +128,7 @@ public class Main {
      */
     private static void testSimplex() {
 
-        LinearConstraint[] constraints = new LinearConstraint[4];
+        LinearConstraint[] constraints = new LinearConstraint[2];
         constraints[0] = new LinearConstraint(new double[] { 3, 5 }, Relationship.LEQ, 78);
         constraints[1] = new LinearConstraint(new double[] { 4, 1 }, Relationship.LEQ, 36);
         constraints[2] = new LinearConstraint(new double[] { 1, 0 }, Relationship.GEQ, 0);

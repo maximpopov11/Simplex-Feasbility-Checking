@@ -29,8 +29,6 @@ import org.apache.commons.math3.fraction.BigFractionField;
 import org.apache.commons.math3.fraction.FractionConversionException;
 import org.apache.commons.math3.linear.Array2DRowFieldMatrix;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.FieldMatrix;
-import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.util.FastMath;
 
 /**

@@ -17,7 +17,6 @@
 package org.apache.commons.math3.filter;
 
 import org.apache.commons.math3.linear.RealMatrix;
-import org.apache.commons.math3.linear.RealVector;
 
 /**
  * Defines the process dynamics model for the use with a {@link KalmanFilter}.
