@@ -45,19 +45,20 @@ public class Simplex {
     /**
      * Runs simplex without saving the results, to be tested for time.
      * @return double representing time taken to run
+     * @param type determines what type of Simplex to run (Simplex/SignChangingSimplex/StackingSimplex)
      */
-    public long run() {
+    public long run(String type) {
 
         long startTime = System.currentTimeMillis();
         Collection<LinearConstraint> currentConstraints = new ArrayList<>();
         for (int i = 0; i < startingConstraints; i++) {
             currentConstraints.add(constraints[i]);
         }
-        runInstance(currentConstraints);
+        runInstance(currentConstraints, type);
         //Runs simplex for each additional inequality (+1, +2, ...), does not save result
         for (int i = startingConstraints; i < constraints.length; i++) {
             currentConstraints.add(constraints[i]);
-            runInstance(currentConstraints);
+            runInstance(currentConstraints, type);
         }
         long endTime = System.currentTimeMillis();
         return endTime - startTime;
@@ -67,15 +68,30 @@ public class Simplex {
     /**
      * Runs an instance of Simplex upon one set of inequalities
      * @param currentConstraints are the inequalities
+     * @param type determines what type of Simplex to run (Simplex/SignChangingSimplex/StackingSimplex)
      */
-    private void runInstance(Collection<LinearConstraint> currentConstraints) {
+    private void runInstance(Collection<LinearConstraint> currentConstraints, String type) {
 
         LinearObjectiveFunction simplex = new LinearObjectiveFunction(coefficients, constant);
         PointValuePair solution = null;
 
         //max
         try {
-            solution = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MAXIMIZE);
+            SimplexSolver simplexSolver;
+            if (type.equals("Simplex")) {
+                solution = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MAXIMIZE);
+            }
+            else if (type.equals("SignChangingSimplex")) {
+                solution = new com.company.signchanging.linear.SimplexSolver()
+                        .optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MAXIMIZE);
+            }
+            else if (type.equals("StackingSimplex")) {
+                System.out.println("Stacking Simplex is not yet implemented, providing base Simplex results:");
+                solution = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MAXIMIZE);
+            }
+            else {
+                System.out.println("Simplex type argument is invalid. Inputted argument: " + type);
+            }
         } catch (TooManyIterationsException e) { // ?
             System.out.println("result1: TooManyIterations");
         } catch (NoFeasibleSolutionException e) {

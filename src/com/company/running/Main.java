@@ -45,7 +45,12 @@ public class Main {
 
         initializeFields(args);
         Simplex simplex = new Simplex(coefficients, constant, numInitialConstraints, constraints);
-        simplex.run();
+        System.out.println("Simplex:");
+        simplex.run("Simplex");
+        System.out.println("Sign-Changing Simplex:");
+        simplex.run("SignChangingSimplex");
+        System.out.println("Stacking Simplex:");
+        simplex.run("StackingSimplex");
 
         //hardcoded simplex
 //        testSimplex();
@@ -134,7 +139,7 @@ public class Main {
         constraints[2] = new LinearConstraint(new double[] { 1, 0 }, Relationship.GEQ, 0);
         constraints[3] = new LinearConstraint(new double[] { 0, 1 }, Relationship.GEQ, 0);
         Simplex simplex = new Simplex(new double[]{5, 4}, 0, constraints.length, constraints);
-        simplex.run();
+        simplex.run("Simplex");
 
     }
 
