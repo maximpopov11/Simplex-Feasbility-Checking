@@ -7,6 +7,7 @@ import org.apache.commons.math3.optim.linear.*;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 public class Simplex {
@@ -51,10 +52,7 @@ public class Simplex {
     public long run(String type) {
 
         long startTime = System.currentTimeMillis();
-        Collection<LinearConstraint> currentConstraints = new ArrayList<>();
-        for (int i = 0; i < startingConstraints; i++) {
-            currentConstraints.add(constraints[i]);
-        }
+        Collection<LinearConstraint> currentConstraints = new ArrayList<>(Arrays.asList(constraints));
         runInstance(currentConstraints, type);
         //Runs simplex for each additional inequality (+1, +2, ...), does not save result
         for (int i = startingConstraints; i < constraints.length; i++) {
@@ -80,27 +78,28 @@ public class Simplex {
         try {
             PointValuePair solutionMax;
             PointValuePair solutionMin;
-            if (type.equals("Simplex")) {
-                solutionMax = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints),
-                        GoalType.MAXIMIZE);
-                solutionMin = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints),
-                        GoalType.MINIMIZE);
-            }
-            else if (type.equals("SignChangingSimplex")) {
-                solutionMax = new com.company.signchanging.linear.SimplexSolver()
-                        .optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MAXIMIZE);
-                solutionMin = new com.company.signchanging.linear.SimplexSolver()
-                        .optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MINIMIZE);
-            }
-            else if (type.equals("StackingSimplex")) {
-                System.out.println("Stacking Simplex is not yet implemented, providing base Simplex results:");
-                solutionMax = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints),
-                        GoalType.MAXIMIZE);
-                solutionMin = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints),
-                        GoalType.MINIMIZE);
-            }
-            else {
-                throw new IllegalArgumentException("Simplex type argument is invalid. Inputted argument: " + type);
+            switch (type) {
+                case "Simplex":
+                    solutionMax = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints),
+                            GoalType.MAXIMIZE);
+                    solutionMin = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints),
+                            GoalType.MINIMIZE);
+                    break;
+                case "SignChangingSimplex":
+                    solutionMax = new com.company.signchanging.linear.SimplexSolver()
+                            .optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MAXIMIZE);
+                    solutionMin = new com.company.signchanging.linear.SimplexSolver()
+                            .optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MINIMIZE);
+                    break;
+                case "StackingSimplex":
+                    System.out.println("Stacking Simplex is not yet implemented, providing base Simplex results:");
+                    solutionMax = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints),
+                            GoalType.MAXIMIZE);
+                    solutionMin = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints),
+                            GoalType.MINIMIZE);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Simplex type argument is invalid. Inputted argument: " + type);
             }
             solution = new Pair<>(solutionMax, solutionMin);
         } catch (TooManyIterationsException e) { // ?
