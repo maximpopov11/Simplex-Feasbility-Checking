@@ -3,6 +3,8 @@ package com.company.running;
 import org.apache.commons.math3.optim.linear.LinearConstraint;
 import org.apache.commons.math3.optim.linear.Relationship;
 
+import static com.company.running.SimplexType.*;
+
 public class Main {
 
     /**
@@ -48,11 +50,11 @@ public class Main {
         initializeFields(args);
         Simplex simplex = new Simplex(coefficients, constant, numInitialConstraints, constraints);
         System.out.println("Simplex:");
-        simplex.run("Simplex");
+        simplex.run(SIMPLEX);
         System.out.println("Sign-Changing Simplex:");
-        simplex.run("SignChangingSimplex");
+        simplex.run(SIGN_CHANGING_SIMPLEX);
         System.out.println("Stacking Simplex:");
-        simplex.run("StackingSimplex");
+        simplex.run(STACKING_SIMPLEX);
 
         //hardcoded simplex
 //        testSimplex();
@@ -137,7 +139,7 @@ public class Main {
         constraints[2] = new LinearConstraint(new double[] { 1, 0 }, Relationship.GEQ, 0);
         constraints[3] = new LinearConstraint(new double[] { 0, 1 }, Relationship.GEQ, 0);
         Simplex simplex = new Simplex(new double[]{5, 4}, 0, constraints.length, constraints);
-        simplex.run("Simplex");
+        simplex.run(SIMPLEX);
 
     }
 

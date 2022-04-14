@@ -49,7 +49,7 @@ public class Simplex {
      * @return double representing time taken to run
      * @param type determines what type of Simplex to run (Simplex/SignChangingSimplex/StackingSimplex)
      */
-    public long run(String type) {
+    public long run(SimplexType type) {
 
         long startTime = System.currentTimeMillis();
         Collection<LinearConstraint> currentConstraints = new ArrayList<>(Arrays.asList(constraints));
@@ -69,29 +69,28 @@ public class Simplex {
      * @param currentConstraints are the inequalities
      * @param type determines what type of Simplex to run (Simplex/SignChangingSimplex/StackingSimplex)
      */
-    private void runInstance(Collection<LinearConstraint> currentConstraints, String type) {
+    private void runInstance(Collection<LinearConstraint> currentConstraints, SimplexType type) {
 
         LinearObjectiveFunction simplex = new LinearObjectiveFunction(coefficients, constant);
         Pair<PointValuePair, PointValuePair> solution = null;
 
-        //max
         try {
             PointValuePair solutionMax;
             PointValuePair solutionMin;
             switch (type) {
-                case "Simplex":
+                case SIMPLEX:
                     solutionMax = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints),
                             GoalType.MAXIMIZE);
                     solutionMin = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints),
                             GoalType.MINIMIZE);
                     break;
-                case "SignChangingSimplex":
+                case SIGN_CHANGING_SIMPLEX:
                     solutionMax = new com.company.signchanging.linear.SimplexSolver()
                             .optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MAXIMIZE);
                     solutionMin = new com.company.signchanging.linear.SimplexSolver()
                             .optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MINIMIZE);
                     break;
-                case "StackingSimplex":
+                case STACKING_SIMPLEX:
                     System.out.println("Stacking Simplex is not yet implemented, providing base Simplex results:");
                     solutionMax = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints),
                             GoalType.MAXIMIZE);
