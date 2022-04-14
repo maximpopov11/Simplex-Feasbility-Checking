@@ -43,6 +43,8 @@ public class Main {
      */
     public static void main(String[] args) {
 
+        //todo: crashes in sign changing simplex, possibly because not enough files were copied from the library
+
         initializeFields(args);
         Simplex simplex = new Simplex(coefficients, constant, numInitialConstraints, constraints);
         System.out.println("Simplex:");
@@ -120,10 +122,6 @@ public class Main {
                 constraints[constraintIndex] = new LinearConstraint(coefficients, relationship, value);
                 constraintIndex++;
             }
-
-            //todo: what if no constraints
-            //todo: what if no additional constraints
-            //todo: example input
         }
 
     }

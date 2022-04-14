@@ -1,5 +1,6 @@
 package com.company.running;
 
+import javafx.util.Pair;
 import org.apache.commons.math3.exception.TooManyIterationsException;
 import org.apache.commons.math3.optim.PointValuePair;
 import org.apache.commons.math3.optim.linear.*;
@@ -73,25 +74,35 @@ public class Simplex {
     private void runInstance(Collection<LinearConstraint> currentConstraints, String type) {
 
         LinearObjectiveFunction simplex = new LinearObjectiveFunction(coefficients, constant);
-        PointValuePair solution = null;
+        Pair<PointValuePair, PointValuePair> solution = null;
 
         //max
         try {
-            SimplexSolver simplexSolver;
+            PointValuePair solutionMax;
+            PointValuePair solutionMin;
             if (type.equals("Simplex")) {
-                solution = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MAXIMIZE);
+                solutionMax = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints),
+                        GoalType.MAXIMIZE);
+                solutionMin = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints),
+                        GoalType.MINIMIZE);
             }
             else if (type.equals("SignChangingSimplex")) {
-                solution = new com.company.signchanging.linear.SimplexSolver()
+                solutionMax = new com.company.signchanging.linear.SimplexSolver()
                         .optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MAXIMIZE);
+                solutionMin = new com.company.signchanging.linear.SimplexSolver()
+                        .optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MINIMIZE);
             }
             else if (type.equals("StackingSimplex")) {
                 System.out.println("Stacking Simplex is not yet implemented, providing base Simplex results:");
-                solution = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MAXIMIZE);
+                solutionMax = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints),
+                        GoalType.MAXIMIZE);
+                solutionMin = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints),
+                        GoalType.MINIMIZE);
             }
             else {
-                System.out.println("Simplex type argument is invalid. Inputted argument: " + type);
+                throw new IllegalArgumentException("Simplex type argument is invalid. Inputted argument: " + type);
             }
+            solution = new Pair<>(solutionMax, solutionMin);
         } catch (TooManyIterationsException e) { // ?
             System.out.println("result1: TooManyIterations");
         } catch (NoFeasibleSolutionException e) {
@@ -100,20 +111,9 @@ public class Simplex {
             System.out.println("result1: UnboundedSolution");
         }
         System.out.print("Max: ");
-        printSolution(solution);
-
-        //min
-        try {
-            solution = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MINIMIZE);
-        } catch (TooManyIterationsException e) { // ?
-            System.out.println("result1: TooManyIterations");
-        } catch (NoFeasibleSolutionException e) {
-            System.out.println("result1: NoFeasibleSolution");
-        } catch (UnboundedSolutionException e) {
-            System.out.println("result1: UnboundedSolution");
-        }
+        printSolution(solution.getKey());
         System.out.print("Min: ");
-        printSolution(solution);
+        printSolution(solution.getValue());
 
     }
 
@@ -133,7 +133,7 @@ public class Simplex {
             }
             System.out.println();
         } else {
-            System.out.println("no max solution");
+            System.out.println("no solution");
         }
 
     }

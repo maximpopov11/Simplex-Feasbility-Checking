@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.commons.math3.exception.TooManyIterationsException;
 import org.apache.commons.math3.optim.OptimizationData;
 import org.apache.commons.math3.optim.PointValuePair;
+import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.util.Precision;
 
@@ -385,8 +386,35 @@ public class SimplexSolver extends LinearOptimizer {
             solutionCallback.setTableau(tableau);
         }
 
+        Boolean maximizing = null;
+        double solutionValue = tableau.getSolution().getValue();
+        if (solutionValue > 0) {
+            if (getGoalType() == GoalType.MAXIMIZE) {
+                return tableau.getSolution();
+            }
+            else {
+                maximizing = false;
+            }
+        }
+        else if (solutionValue < 0) {
+            if (getGoalType() == GoalType.MAXIMIZE) {
+                maximizing = true;
+            }
+            else {
+                return tableau.getSolution();
+            }
+        }
+        //else solutionValue == 0 and we need to both maximize and minimize, maximizing remains null
+
         while (!tableau.isOptimal()) {
+
             doIteration(tableau);
+
+            solutionValue = tableau.getSolution().getValue();
+            if (solutionValue != 0 && (maximizing == null || (maximizing ^ solutionValue < 0))) {
+                return tableau.getSolution();
+            }
+
         }
 
         // check that the solution respects the nonNegative restriction in case
