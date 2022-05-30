@@ -85,10 +85,10 @@ public class Simplex {
                             GoalType.MINIMIZE);
                     break;
                 case SIGN_CHANGING_SIMPLEX:
-                    solutionMax = new com.company.signchanging.linear.SimplexSolver()
-                            .optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MAXIMIZE);
-                    solutionMin = new com.company.signchanging.linear.SimplexSolver()
-                            .optimize(simplex, new LinearConstraintSet(currentConstraints), GoalType.MINIMIZE);
+                    solutionMax = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints),
+                            GoalType.MAXIMIZE);
+                    solutionMin = new SimplexSolver().optimize(simplex, new LinearConstraintSet(currentConstraints),
+                            GoalType.MINIMIZE);
                     break;
                 case STACKING_SIMPLEX:
                     System.out.println("Stacking Simplex is not yet implemented, providing base Simplex results:");

@@ -14,6 +14,8 @@ import org.apache.commons.math3.optim.linear.SimplexSolver;
 import org.apache.commons.math3.optim.linear.UnboundedSolutionException;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
 
+//todo: this is for the old simplex library
+
 /**
  * Runs Simplex over specific parameters to test its usage.
  */
