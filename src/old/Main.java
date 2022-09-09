@@ -1,12 +1,11 @@
-package com.company.running;
+package old;
 
 import org.apache.commons.math3.optim.linear.LinearConstraint;
 import org.apache.commons.math3.optim.linear.Relationship;
 
-import static com.company.running.SimplexType.*;
+import static old.SimplexType.*;
 
 public class Main {
-    //todo: use two phase simplex
 
     /**
      * Coefficients for target function variables
@@ -46,6 +45,8 @@ public class Main {
      */
     public static void main(String[] args) {
 
+        //crashes in sign changing simplex, possibly because not enough files were copied from the library
+
         initializeFields(args);
         Simplex simplex = new Simplex(coefficients, constant, numInitialConstraints, constraints);
         System.out.println("Simplex:");
@@ -70,7 +71,7 @@ public class Main {
 
         //randomly generated args
         if (args[0].equals("random")) {
-            //todo: random args
+            // complete random args
         }
         //given args
         else {

@@ -1,21 +1,5 @@
 package com.company.running;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import org.apache.commons.math3.exception.TooManyIterationsException;
-import org.apache.commons.math3.optim.PointValuePair;
-import org.apache.commons.math3.optim.linear.LinearConstraint;
-import org.apache.commons.math3.optim.linear.LinearConstraintSet;
-import org.apache.commons.math3.optim.linear.LinearObjectiveFunction;
-import org.apache.commons.math3.optim.linear.NoFeasibleSolutionException;
-import org.apache.commons.math3.optim.linear.Relationship;
-import org.apache.commons.math3.optim.linear.SimplexSolver;
-import org.apache.commons.math3.optim.linear.UnboundedSolutionException;
-import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
-
-//todo: this is for the old simplex library
-
 /**
  * Runs Simplex over specific parameters to test its usage.
  */
@@ -23,38 +7,37 @@ public class SimplexTest {
 
     public static void main(String[] args) {
 
-        //Sets up the optimization problem
-        LinearObjectiveFunction function = new LinearObjectiveFunction(new double[]{5, 4}, 0);
-        Collection<LinearConstraint> constraints = new ArrayList<LinearConstraint>();
-        constraints.add(new LinearConstraint(new double[] { 3, 5 }, Relationship.LEQ, 78));
-        constraints.add(new LinearConstraint(new double[] { 4, 1 }, Relationship.LEQ, 36));
-        constraints.add(new LinearConstraint(new double[] { 1, 0 }, Relationship.GEQ, 0));
-        constraints.add(new LinearConstraint(new double[] { 0, 1 }, Relationship.GEQ, 0));
+        // maximizing: value = 78 at (6, 12)
+        // function: 5x1 + 4x2
+        // constraint 1: 3x1 + 5x2 <= 78
+        // constraint 2: 4x1 + x1 <= 36
+        double[][] A1 = {
+                {3, 5},
+                {4, 1}
+        };
+        double[] b1 = new double[]{78, 36};
+        double[] c1 = new double[]{5, 4};
+        TwoPhaseSimplex.test(A1, b1, c1);
 
-        //Finds solution
-        PointValuePair solution = null;
-        try {
-            solution = new SimplexSolver().optimize(function, new LinearConstraintSet(constraints), GoalType.MAXIMIZE);
-        } catch (TooManyIterationsException e) { // ?
-            System.out.println("result1: TooManyIterations");
-        } catch (NoFeasibleSolutionException e) {
-            System.out.println("result1: NoFeasibleSolution");
-        } catch (UnboundedSolutionException e) {
-            System.out.println("result1: UnboundedSolution");
-        }
+        // we swap b and c and transpose A, then multiply all values by -1
+        // to get opposite (max/min) version and opposite (>/< constraints)
 
-        //Prints solution
-        if (solution != null) {
-            // get solution
-            double max = solution.getValue();
-            System.out.println("Opt: " + max);
-            // print decision variables
-            for (int i = 0; i < 2; i++) {
-                System.out.print(solution.getPoint()[i] + "\t");
-            }
-        } else {
-            System.out.println("no solution");
-        }
+        //minimizing: value = -78 at (6, 12)
+        // function: -5x1 + -4x2
+        // constraint 1: 3x1 + 5x2 >= -78
+        // constraint 2: 4x1 + x1 >= -36
+        // =
+        // if understanding is correct:
+        // function: -78x1 + -36x2
+        // constraint 1: -3x1 + -4x2 >= -5
+        // constraint 2: -5x1 + -x1 >= -4
+        double[][] A2 = {
+                {-3, -4},
+                {-5, -1}
+        };
+        double[] b2 = new double[]{-5, -4};
+        double[] c2 = new double[]{-78, -36};
+        TwoPhaseSimplex.test(A2, b2, c2);
 
     }
 

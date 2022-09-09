@@ -1,4 +1,4 @@
-package com.company.running;
+package old;
 
 //from: https://algs4.cs.princeton.edu/65reductions/TwoPhaseSimplex.java.html
 
@@ -17,9 +17,6 @@ public class TwoPhaseSimplex {
     private int[] basis;    // basis[i] = basic variable corresponding to row i
 
     // sets up the simplex tableaux
-    // A: constraint coefficients
-    // b: constraint constants
-    // c: maximizing function constants
     public TwoPhaseSimplex(double[][] A, double[] b, double[] c) {
         m = b.length;
         n = c.length;
@@ -54,9 +51,18 @@ public class TwoPhaseSimplex {
         for (int i = 0; i < m; i++)
             basis[i] = n + m + i;
 
+        // System.out.println("before phase I");
+        // show();
+
         phase1();
 
+        // System.out.println("before phase II");
+        // show();
+
         phase2();
+
+        // System.out.println("after phase II");
+        // show();
 
         // check optimality conditions
         assert check(A, b, c);
@@ -134,9 +140,6 @@ public class TwoPhaseSimplex {
 
     // pivot on entry (p, q) using Gauss-Jordan elimination
     private void pivot(int p, int q) {
-
-        //check >/< 0 here?
-        int placeholder = 0;
 
         // everything but row p and column q
         for (int i = 0; i <= m+1; i++)
@@ -303,7 +306,7 @@ public class TwoPhaseSimplex {
         test(A, b, c);
     }
 
-    // dual of test1():  y0 = 12, y1 = 28, opt = -800
+    // dual of test1():  x0 = 12, x1 = 28, opt = 800
     public static void test2() {
         double[] b = {  -13.0,  -23.0 };
         double[] c = { -480.0, -160.0, -1190.0 };

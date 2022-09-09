@@ -1,4 +1,4 @@
-package com.company.running;
+package old;
 
 import javafx.util.Pair;
 import org.apache.commons.math3.exception.TooManyIterationsException;
@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 public class Simplex {
-    //todo: use two phase simplex
 
     /**
      * Coefficients for target function variables
