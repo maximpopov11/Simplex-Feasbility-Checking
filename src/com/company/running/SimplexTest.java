@@ -27,7 +27,6 @@ public class SimplexTest {
         // constraint 1: 3x1 + 5x2 >= -78
         // constraint 2: 4x1 + x1 >= -36
         // =
-        // if understanding is correct:
         // function: -78x1 + -36x2
         // constraint 1: -3x1 + -4x2 >= -5
         // constraint 2: -5x1 + -x1 >= -4
