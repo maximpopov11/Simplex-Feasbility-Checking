@@ -11,9 +11,11 @@ public class Main {
 
         double[][] constraintVariableCoefficients = {
                 {3, 5},
-                {4, 1}
+                {4, 1},
+                {-1, 0},
+                {0, -1},
         };
-        double[] constraintConstants = new double[]{78, 36};
+        double[] constraintConstants = new double[]{78, 36, 0, 0};
         double[] functionVariableCoefficients = new double[]{5, 4};
 
         Simplex simplex = new Simplex(constraintVariableCoefficients, constraintConstants, functionVariableCoefficients);

@@ -23,14 +23,18 @@ public class Simplex {
      * Manipulates max parameters to create the min version.
      */
     private void setupMin() {
+        // TODO: BUG: when unbounded we throw an exception, instead treat that as infinity or -infinity
+
         // Transpose constraintVariableCoefficients
-        // Multiply all values by -1
         int m = constraintVariableCoefficients.length;
         int n = constraintVariableCoefficients[0].length;
         constraintVariableCoefficientsMin = new double[n][m];
         for(int x = 0; x < n; x++) {
             for(int y = 0; y < m; y++) {
-                constraintVariableCoefficientsMin[x][y] = -constraintVariableCoefficients[y][x];
+                constraintVariableCoefficientsMin[x][y] = constraintVariableCoefficients[y][x];
+                if (x >= m - n) {
+                    constraintVariableCoefficientsMin[x][y] = -constraintVariableCoefficientsMin[x][y];
+                }
             }
         }
 
@@ -62,8 +66,11 @@ public class Simplex {
                         functionVariableCoefficientsMin);
                 break;
             case SIGN_CHANGING_SIMPLEX:
-                System.out.println("Sign Changing Simplex not yet implemented");
-                return;
+                max = new TwoPhaseSignChangingSimplex(constraintVariableCoefficients, constraintConstants,
+                        functionVariableCoefficients);
+                min = new TwoPhaseSignChangingSimplex(constraintVariableCoefficientsMin, constraintConstantsMin,
+                        functionVariableCoefficientsMin);
+                break;
             case STACKING_SIMPLEX:
                 System.out.println("Stacking Simplex not yet implemented");
                 return;
