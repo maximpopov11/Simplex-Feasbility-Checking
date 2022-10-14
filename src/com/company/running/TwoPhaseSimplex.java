@@ -2,10 +2,6 @@ package com.company.running;
 
 //from: https://algs4.cs.princeton.edu/65reductions/TwoPhaseSimplex.java.html
 
-interface SimplexMarker {
-    double value();
-}
-
 public class TwoPhaseSimplex implements SimplexMarker {
     private static final double EPSILON = 1.0E-8;
 
