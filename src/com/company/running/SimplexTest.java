@@ -19,7 +19,7 @@ public class SimplexTest {
         double[] c1 = new double[]{5, 4};
         TwoPhaseSimplex.test(A1, b1, c1);
 
-        // we swap b and c and transpose A, then multiply all values by -1
+        // we swap b and c, transpose A, and multiply all values by -1
         // to get opposite (max/min) version and opposite (>/< constraints)
 
         //minimizing: value = -78 at (6, 12)

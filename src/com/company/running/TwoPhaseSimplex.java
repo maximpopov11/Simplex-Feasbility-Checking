@@ -273,6 +273,60 @@ public class TwoPhaseSimplex {
     }
 
 
+    /**
+     * Runs minimization and maximization of Simplex and prints results
+     */
+    public static void runMinMaxSimplex(double[][] constraintVariableCoefficients, double[] constraintConstants,
+                                        double[] functionVariableCoefficients) {
+
+        TwoPhaseSimplex max;
+        try {
+            max = new TwoPhaseSimplex(constraintVariableCoefficients, constraintConstants, functionVariableCoefficients);
+        }
+        catch (ArithmeticException e) {
+            System.out.println(e);
+            return;
+        }
+
+        // Transpose constraintVariableCoefficients
+        // Multiply all values by -1
+        int m = constraintVariableCoefficients.length;
+        int n = constraintVariableCoefficients[0].length;
+        double[][] constraintVariableCoefficientsMin = new double[n][m];
+        for(int x = 0; x < n; x++) {
+            for(int y = 0; y < m; y++) {
+                constraintVariableCoefficientsMin[x][y] = -constraintVariableCoefficients[y][x];
+            }
+        }
+
+        // Swap constraintConstants and functionVariableCoefficients
+        // Multiply all values by -1
+        double[] constraintConstantsMin = new double[functionVariableCoefficients.length];
+        for(int i = 0; i < constraintConstantsMin.length; i++) {
+            constraintConstantsMin[i] = -functionVariableCoefficients[i];
+        }
+        double[] functionVariableCoefficientsMin = new double[constraintConstants.length];
+        for(int i = 0; i < functionVariableCoefficientsMin.length; i++) {
+            functionVariableCoefficientsMin[i] = -constraintConstants[i];
+        }
+
+        TwoPhaseSimplex min;
+        try {
+            min = new TwoPhaseSimplex(constraintVariableCoefficientsMin, constraintConstantsMin,
+                    functionVariableCoefficientsMin);
+        }
+        catch (ArithmeticException e) {
+            System.out.println(e);
+            return;
+        }
+
+        System.out.println("Min: " + min.value());
+        System.out.println("Max: " + max.value());
+        // TODO: what is our rule around 0?
+        boolean split = min.value() < 0 && max.value() > 0;
+        System.out.println("Split: " + split);
+    }
+
     public static void test(double[][] A, double[] b, double[] c) {
         TwoPhaseSimplex lp;
         try {
