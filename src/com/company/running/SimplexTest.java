@@ -7,36 +7,71 @@ public class SimplexTest {
 
     public static void main(String[] args) {
 
-        // maximizing: value = 78 at (6, 12)
-        // function: 5x1 + 4x2
-        // constraint 1: 3x1 + 5x2 <= 78
-        // constraint 2: 4x1 + x1 <= 36
-        double[][] A1 = {
-                {3, 5},
-                {4, 1}
+        // maximizing: value = 3 at (1, 1)
+        // function: 2x1 + 1x2
+        // constraint 1: 1x1 + 0x2 <= 1
+        // constraint 2: 0x1 + 1x2 <= 1
+        // constraint 3: 1x1 + 0x2 >= -1  -->  -1x1 + 0x2 <= 1
+        // constraint 4: 0x1 + 1x2 >= -1  -->  0x1 + -1x2 <= 1
+        double[] functionConstantsMaxSquare = {  2.0,  1.0  };
+        double[] constraintConstantsMaxSquare = {  1.0, 1.0, 1.0, 1.0  };
+        double[][] constraintCoefficientsMaxSquare = {
+                {  1.0, 0.0  },
+                {  0.0, 1.0  },
+                {  -1.0, 0.0  },
+                {  0.0, -1.0  },
         };
-        double[] b1 = new double[]{78, 36};
-        double[] c1 = new double[]{5, 4};
-        test(A1, b1, c1);
+        System.out.println("Square around origin max");
+        test(constraintCoefficientsMaxSquare, constraintConstantsMaxSquare, functionConstantsMaxSquare);
+        // results: our xi = simplex xi
 
-        // we swap b and c, transpose A, and multiply all values by -1
-        // to get opposite (max/min) version and opposite (>/< constraints)
-
-        //minimizing: value = -78 at (6, 12)
-        // function: -5x1 + -4x2
-        // constraint 1: 3x1 + 5x2 >= -78
-        // constraint 2: 4x1 + x1 >= -36
-        // =
-        // function: -78x1 + -36x2
-        // constraint 1: -3x1 + -4x2 >= -5
-        // constraint 2: -5x1 + -x1 >= -4
-        double[][] A2 = {
-                {-3, -4},
-                {-5, -1}
+        // maximizing: value = -3 at (-1, -1)
+        // for minimization: transpose matrix:
+        //  transpose constraintCoefficients
+        //  swap functionConstants and constraintConstants and multiply both by -1
+        double[] constraintConstantsMinSquare = {  -2.0,  -1.0  };
+        double[] functionConstantsMinSquare = {  -1.0, -1.0, -1.0, -1.0  };
+        double[][] constraintCoefficientsMinSquare = {
+                {  1.0, 0.0, -1.0, 0.0  },
+                {  0.0, 1.0, 0.0, -1.0  },
         };
-        double[] b2 = new double[]{-5, -4};
-        double[] c2 = new double[]{-78, -36};
-        test(A2, b2, c2);
+        System.out.println("Square around origin min");
+        test(constraintCoefficientsMinSquare, constraintConstantsMinSquare, functionConstantsMinSquare);
+        // results: our xi = simplex yi * -1
+
+
+
+        // maximizing: value = 5 at (2, 1)
+        // function: 2x1 + 1x2
+        // constraint 1: 1x1 + 0x2 <= 2
+        // constraint 2: 0x1 + 1x2 <= 1
+        // constraint 3: 1x1 + 0x2 >= -1  -->  -1x1 + 0x2 <= 1
+        // constraint 4: 0x1 + 1x2 >= -2  -->  0x1 + -1x2 <= 2
+        double[] functionConstantsMaxRectangle = {  2.0,  1.0  };
+        double[] constraintConstantsMaxRectangle = {  2.0, 1.0, 1.0, 2.0  };
+        double[][] constraintCoefficientsMaxRectangle = {
+                {  1.0, 0.0  },
+                {  0.0, 1.0  },
+                {  -1.0, 0.0  },
+                {  0.0, -1.0  },
+        };
+        System.out.println("Rectangle around origin max");
+        test(constraintCoefficientsMaxRectangle, constraintConstantsMaxRectangle, functionConstantsMaxRectangle);
+        // results: our xi = simplex xi
+
+        // maximizing: value = -4 at (-1, -2)
+        // for minimization: transpose matrix:
+        //  transpose constraintCoefficients
+        //  swap functionConstants and constraintConstants and multiply both by -1
+        double[] constraintConstantsMinRectangle = {  -2.0,  -1.0  };
+        double[] functionConstantsMinRectangle = {  -2.0, -1.0, -1.0, -2.0  };
+        double[][] constraintCoefficientsMinRectangle = {
+                {  1.0, 0.0, -1.0, 0.0  },
+                {  0.0, 1.0, 0.0, -1.0  },
+        };
+        System.out.println("Rectangle around origin min");
+        test(constraintCoefficientsMinRectangle, constraintConstantsMinRectangle, functionConstantsMinRectangle);
+        // results: our xi = simplex yi * -1
 
     }
 
