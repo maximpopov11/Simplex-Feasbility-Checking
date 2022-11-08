@@ -1,228 +1,88 @@
 package com.company.running;
 
-// Modified code from https://gist.github.com/mik30s/f285b99ad96589be60553d83a48d85c1
-
-// The Following solves a linear programming problem
-// In standardized form using the simplex method
-// Please the read below.
-/************************************************USAGE*************************************************************
- * 1.Create an instance of the simplex class
- * 2.Fill in the table with the standardized form of the problem by calling simplex.fillTable()
- * 3.Create a while loop and call the simplex.compute() method until it returns ERROR.IS_OPTIMAL or ERROR.UNBOUNDED
- * ****************************************************************************************************************/
-
 public class Simplex {
-    private int rows, cols; // row and column
-    private float[][] table; // simplex tableau
-    private boolean solutionIsUnbounded = false;
+    double[][] constraintVariableCoefficients;
+    double[] constraintConstants;
+    double[] functionVariableCoefficients;
+    double[][] constraintVariableCoefficientsMin;
+    double[] constraintConstantsMin;
+    double[] functionVariableCoefficientsMin;
 
-    public static enum ERROR{
-        NOT_OPTIMAL,
-        IS_OPTIMAL,
-        UNBOUNDED
-    };
-
-    public Simplex(int numOfConstraints, int numOfUnknowns){
-        rows = numOfConstraints+1; // row number + 1
-        cols = numOfUnknowns+1;   // column number + 1
-        table = new float[rows][]; // create a 2d array
-
-        // initialize references to arrays
-        for(int i = 0; i < rows; i++){
-            table[i] = new float[cols];
-        }
+    /**
+     * Creates Simplex instance.
+     */
+    public Simplex(double[][] constraintVariableCoefficients, double[] constraintConstants,
+                   double[] functionVariableCoefficients) {
+        this.constraintVariableCoefficients = constraintVariableCoefficients;
+        this.constraintConstants = constraintConstants;
+        this.functionVariableCoefficients = functionVariableCoefficients;
+        setupMin();
     }
 
-    // prints out the simplex tableau
-    public void print(){
-        for(int i = 0; i < rows; i++){
-            for(int j = 0; j < cols; j++){
-                String value = String.format("%.2f", table[i][j]);
-                System.out.print(value + "\t");
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
+    /**
+     * Manipulates max parameters to create the min version.
+     */
+    private void setupMin() {
+        // TODO: BUG: when unbounded we throw an exception, instead treat that as infinity or -infinity
 
-    // fills the simplex tableau with coefficients
-    public void fillTable(float[][] data){
-        for(int i = 0; i < table.length; i++){
-            System.arraycopy(data[i], 0, this.table[i], 0, data[i].length);
-        }
-    }
-
-    // computes the values of the simplex tableau
-    // should be use in a loop to continously compute until
-    // an optimal solution is found
-    public ERROR compute(){
-        // step 1
-        if(checkOptimality()){
-            return ERROR.IS_OPTIMAL; // solution is optimal
-        }
-
-        // step 2
-        // find the entering column
-        int pivotColumn = findEnteringColumn();
-        System.out.println("Pivot Column: "+pivotColumn);
-
-        // step 3
-        // find departing value
-        float[] ratios = calculateRatios(pivotColumn);
-        if(solutionIsUnbounded == true)
-            return ERROR.UNBOUNDED;
-        int pivotRow = findSmallestValue(ratios);
-        //System.out.println("Pivot row: "+ pivotRow);
-
-        // step 4
-        // form the next tableau
-        formNextTableau(pivotRow, pivotColumn);
-
-        // since we formed a new table so return NOT_OPTIMAL
-        return ERROR.NOT_OPTIMAL;
-    }
-
-    // Forms a new tableau from precomuted values.
-    private void formNextTableau(int pivotRow, int pivotColumn){
-        float pivotValue = table[pivotRow][pivotColumn];
-        float[] pivotRowVals = new float[cols];
-        float[] pivotColumnVals = new float[cols];
-        float[] rowNew = new float[cols];
-
-        // divide all entries in pivot row by entry inpivot column
-        // get entry in pivot row
-        System.arraycopy(table[pivotRow], 0, pivotRowVals, 0, cols);
-
-        // get entry inpivot colum
-        for(int i = 0; i < rows; i++)
-            pivotColumnVals[i] = table[i][pivotColumn];
-
-        // divide values in pivot row by pivot value
-        for(int  i = 0; i < cols; i++)
-            rowNew[i] =  pivotRowVals[i] / pivotValue;
-
-        // subtract from each of the other rows
-        for(int i = 0; i < rows; i++){
-            if(i != pivotRow){
-                for(int j = 0; j < cols; j++){
-                    float c = pivotColumnVals[i];
-                    table[i][j] = table[i][j] - (c * rowNew[j]);
+        // Transpose constraintVariableCoefficients
+        int m = constraintVariableCoefficients.length;
+        int n = constraintVariableCoefficients[0].length;
+        constraintVariableCoefficientsMin = new double[n][m];
+        for(int x = 0; x < n; x++) {
+            for(int y = 0; y < m; y++) {
+                constraintVariableCoefficientsMin[x][y] = constraintVariableCoefficients[y][x];
+                if (x >= m - n) {
+                    constraintVariableCoefficientsMin[x][y] = -constraintVariableCoefficientsMin[x][y];
                 }
             }
         }
 
-        // replace the row
-        System.arraycopy(rowNew, 0, table[pivotRow], 0, rowNew.length);
+        // Swap constraintConstants and functionVariableCoefficients
+        // Multiply all values by -1
+        constraintConstantsMin = new double[functionVariableCoefficients.length];
+        for(int i = 0; i < constraintConstantsMin.length; i++) {
+            constraintConstantsMin[i] = -functionVariableCoefficients[i];
+        }
+        functionVariableCoefficientsMin = new double[constraintConstants.length];
+        for(int i = 0; i < functionVariableCoefficientsMin.length; i++) {
+            functionVariableCoefficientsMin[i] = -constraintConstants[i];
+        }
     }
 
-    // calculates the pivot row ratios
-    private float[] calculateRatios(int column){
-        float[] positiveEntries = new float[rows];
-        float[] res = new float[rows];
-        int allNegativeCount = 0;
-        for(int i = 0; i < rows; i++){
-            if(table[i][column] > 0){
-                positiveEntries[i] = table[i][column];
-            }
-            else{
-                positiveEntries[i] = 0;
-                allNegativeCount++;
-            }
-            //System.out.println(positiveEntries[i]);
+    /**
+     * Runs simplex without saving the results, to be tested for time.
+     * @param type determines what type of Simplex to run (Simplex/SignChangingSimplex/StackingSimplex)
+     */
+    public void run(SimplexType type) {
+        SimplexMarker max;
+        SimplexMarker min;
+
+        switch (type) {
+            case SIMPLEX:
+                max = new TwoPhaseSimplex(constraintVariableCoefficients, constraintConstants,
+                        functionVariableCoefficients);
+                min = new TwoPhaseSimplex(constraintVariableCoefficientsMin, constraintConstantsMin,
+                        functionVariableCoefficientsMin);
+                break;
+            case SIGN_CHANGING_SIMPLEX:
+                max = new TwoPhaseSignChangingSimplex(constraintVariableCoefficients, constraintConstants,
+                        functionVariableCoefficients);
+                min = new TwoPhaseSignChangingSimplex(constraintVariableCoefficientsMin, constraintConstantsMin,
+                        functionVariableCoefficientsMin);
+                break;
+            case STACKING_SIMPLEX:
+                System.out.println("Stacking Simplex not yet implemented");
+                return;
+            default:
+                throw new IllegalArgumentException("Simplex type argument is invalid. Inputted argument: " + type);
         }
 
-        if(allNegativeCount == rows)
-            this.solutionIsUnbounded = true;
-        else{
-            for(int i = 0;  i < rows; i++){
-                float val = positiveEntries[i];
-                if(val > 0){
-                    res[i] = table[i][cols -1] / val;
-                }
-            }
-        }
-
-        return res;
+        System.out.println("Min: " + min.value());
+        System.out.println("Max: " + max.value());
+        // TODO: what is our rule around 0?
+        boolean split = min.value() < 0 && max.value() > 0;
+        System.out.println("Split: " + split);
     }
 
-    // finds the next entering column
-    private int findEnteringColumn(){
-        float[] values = new float[cols];
-        int location = 0;
-
-        int pos, count = 0;
-        for(pos = 0; pos < cols-1; pos++){
-            if(table[rows-1][pos] < 0){
-                //System.out.println("negative value found");
-                count++;
-            }
-        }
-
-        if(count >= 1){
-            for(int i = 0; i < cols-1; i++)
-                values[i] = Math.abs(table[rows-1][i]);
-            location = findLargestValue(values);
-        } else location = count - 1;
-
-        return location;
-    }
-
-
-    // finds the smallest value in an array
-    private int findSmallestValue(float[] data){
-        float minimum ;
-        int c, location = 0;
-        minimum = data[0];
-
-        for(c = 1; c < data.length; c++){
-            if(data[c] > 0){
-                if(Float.compare(data[c], minimum) < 0){
-                    minimum = data[c];
-                    location  = c;
-                }
-            }
-        }
-
-        return location;
-    }
-
-    // finds the largest value in an array
-    private int findLargestValue(float[] data){
-        float maximum = 0;
-        int c, location = 0;
-        maximum = data[0];
-
-        for(c = 1; c < data.length; c++){
-            if(Float.compare(data[c], maximum) > 0){
-                maximum = data[c];
-                location  = c;
-            }
-        }
-
-        return location;
-    }
-
-    // checks if the table is optimal
-    public boolean checkOptimality(){
-        boolean isOptimal = false;
-        int vCount = 0;
-
-        for(int i = 0; i < cols-1; i++){
-            float val = table[rows-1][i];
-            if(val >= 0){
-                vCount++;
-            }
-        }
-
-        if(vCount == cols-1){
-            isOptimal = true;
-        }
-
-        return isOptimal;
-    }
-
-    // returns the simplex tableau
-    public float[][] getTable() {
-        return table;
-    }
 }
