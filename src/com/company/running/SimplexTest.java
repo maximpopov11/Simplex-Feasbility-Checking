@@ -60,6 +60,45 @@ public class SimplexTest {
                 break;
             }
         }
+
+        // Box area maximization
+        numConstraints = 4;
+        numVariables = 2 + numConstraints;
+        simplex = new Simplex(numConstraints, numVariables);
+        // maximizing: value = 3 at (2, 1)
+        // function: 2x1 + 1x2
+        // constraint 1: 1x1 + 0x2 <= 1
+        // constraint 2: 0x1 + 1x2 <= 1
+        // constraint 3: 1x1 + 0x2 >= -1
+        // constraint 4: 0x1 + 1x2 >= -1
+//        float[][] tableauBoxMax = {
+//                {1, 0, 1, 0, 0, 0, 1},
+//                {0, 1, 0, 1, 0, 0, 1},
+//                {1, 0, 0, 0, -1, 0, 1},
+//                {0, 1, 0, 0, 0, -1, 1},
+//                {-2, -1, 0, 0, 0, 0, 0},
+//        };
+        numConstraints = 3;
+        numVariables = 6;
+        simplex = new Simplex(numConstraints, numVariables);
+        float[][] tableauBoxMax = {
+                {2, 1, 1, 1, 0, 0, 50},
+                {2, 1, 0, 0, -1, 0, 36},
+                {1, 0, 1, 0, 0, -1, 10},
+                {-1, -1, -2, 0, 0, 0, 0},
+        };
+        simplex.fillTable(tableauBoxMax);
+        while (true) {
+            Simplex.ERROR result = simplex.compute();
+            if(result == Simplex.ERROR.IS_OPTIMAL) {
+                System.out.println("Optimal Solution Tableau:");
+                simplex.print();
+                break;
+            } else if (result == Simplex.ERROR.UNBOUNDED) {
+                System.out.println("Unbounded!");
+                break;
+            }
+        }
     }
 
 }
