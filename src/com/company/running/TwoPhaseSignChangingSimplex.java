@@ -2,7 +2,6 @@ package com.company.running;
 
 //from: https://algs4.cs.princeton.edu/65reductions/TwoPhaseSimplex.java.html
 
-// TODO: implement sign changing
 public class TwoPhaseSignChangingSimplex implements SimplexMarker {
     private static final double EPSILON = 1.0E-8;
 
@@ -17,14 +16,17 @@ public class TwoPhaseSignChangingSimplex implements SimplexMarker {
 
     private int[] basis;    // basis[i] = basic variable corresponding to row i
 
+    boolean maximizing;     // true if we are maximizing false if minimizing: for early termination
+
     // sets up the simplex tableaux
     // A: constraint coefficients
     // b: constraint constants
     // c: maximizing function constants
-    public TwoPhaseSignChangingSimplex(double[][] A, double[] b, double[] c) {
+    public TwoPhaseSignChangingSimplex(double[][] A, double[] b, double[] c, boolean maximizing) {
         m = b.length;
         n = c.length;
         a = new double[m+2][n+m+m+1];
+        maximizing = maximizing;
         for (int i = 0; i < m; i++)
             for (int j = 0; j < n; j++)
                 a[i][j] = A[i][j];
@@ -89,6 +91,18 @@ public class TwoPhaseSignChangingSimplex implements SimplexMarker {
     // run simplex algorithm starting from initial basic feasible solution
     private void phase2() {
         while (true) {
+
+            // Every time we get a new and better BFS we get to this point
+            // We can check if the value has passed 0 in the correct direction and terminate early if so
+            if (maximizing) {
+                if (this.value() > 0) {
+                    return;
+                }
+            } else {
+                if (this.value() < 0) {
+                    return;
+                }
+            }
 
             // find entering column q
             int q = bland2();

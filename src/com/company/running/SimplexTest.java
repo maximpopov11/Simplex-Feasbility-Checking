@@ -81,7 +81,7 @@ public class SimplexTest {
             lp = new TwoPhaseSimplex(A, b, c);
         }
         catch (ArithmeticException e) {
-            System.out.println(e);
+            System.out.println(e.getMessage());
             return;
         }
         System.out.println("value = " + lp.value());

@@ -22,10 +22,7 @@ public class Simplex {
     /**
      * Manipulates max parameters to create the min version.
      */
-    private void setupMin() {
-        // TODO: BUG: when unbounded we throw an exception, instead treat that as infinity or -infinity
-
-        // Transpose constraintVariableCoefficients
+    private void setupMin() {// Transpose constraintVariableCoefficients
         int m = constraintVariableCoefficients.length;
         int n = constraintVariableCoefficients[0].length;
         constraintVariableCoefficientsMin = new double[n][m];
@@ -67,9 +64,9 @@ public class Simplex {
                 break;
             case SIGN_CHANGING_SIMPLEX:
                 max = new TwoPhaseSignChangingSimplex(constraintVariableCoefficients, constraintConstants,
-                        functionVariableCoefficients);
+                        functionVariableCoefficients, true);
                 min = new TwoPhaseSignChangingSimplex(constraintVariableCoefficientsMin, constraintConstantsMin,
-                        functionVariableCoefficientsMin);
+                        functionVariableCoefficientsMin, false);
                 break;
             case STACKING_SIMPLEX:
                 System.out.println("Stacking Simplex not yet implemented");
@@ -80,7 +77,6 @@ public class Simplex {
 
         System.out.println("Min: " + min.value());
         System.out.println("Max: " + max.value());
-        // TODO: what is our rule around 0?
         boolean split = min.value() < 0 && max.value() > 0;
         System.out.println("Split: " + split);
     }

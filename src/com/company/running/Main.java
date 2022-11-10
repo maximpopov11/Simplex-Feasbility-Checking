@@ -10,20 +10,36 @@ public class Main {
     public static void main(String[] args) {
 
         double[][] constraintVariableCoefficients = {
-                {3, 5},
-                {4, 1},
+                {1, 0},
+                {0, 1},
                 {-1, 0},
                 {0, -1},
         };
-        double[] constraintConstants = new double[]{78, 36, 0, 0};
-        double[] functionVariableCoefficients = new double[]{5, 4};
+        double[] constraintConstants = new double[]{2, 1, 1, 2};
+        double[] functionVariableCoefficients = new double[]{2, 1};
+
+        long startTime;
+        long endTime;
+        long totalTime;
 
         Simplex simplex = new Simplex(constraintVariableCoefficients, constraintConstants, functionVariableCoefficients);
         System.out.println("Simplex:");
+        startTime = System.nanoTime();
         simplex.run(SIMPLEX);
+        endTime = System.nanoTime();
+        totalTime = endTime - startTime;
+        System.out.println("Time: " + totalTime);
         System.out.println("\nSign-Changing Simplex:");
+        startTime = System.nanoTime();
         simplex.run(SIGN_CHANGING_SIMPLEX);
+        endTime = System.nanoTime();
+        totalTime = endTime - startTime;
+        System.out.println("Time: " + totalTime);
         System.out.println("\nStacking Simplex:");
+        startTime = System.nanoTime();
         simplex.run(STACKING_SIMPLEX);
+        endTime = System.nanoTime();
+        totalTime = endTime - startTime;
+        System.out.println("Time: " + totalTime);
     }
 }
