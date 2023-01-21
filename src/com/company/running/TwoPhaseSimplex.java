@@ -19,7 +19,7 @@ public class TwoPhaseSimplex implements SimplexMarker {
     // sets up the simplex tableaux
     // A: constraint coefficients
     // b: constraint constants
-    // c: maximizing function constants
+    // c: maximizing objective function constants
     public TwoPhaseSimplex(double[][] A, double[] b, double[] c) {
         m = b.length;
         n = c.length;

@@ -1,49 +1,26 @@
 package com.company.running;
 
 public class Simplex {
+    boolean unrestrictedVariables;
+
     double[][] constraintVariableCoefficients;
     double[] constraintConstants;
-    double[] functionVariableCoefficients;
-    double[][] constraintVariableCoefficientsMin;
-    double[] constraintConstantsMin;
-    double[] functionVariableCoefficientsMin;
+    double[] objectiveFunctionVariableCoefficients;
+    double[] objectiveFunctionVariableCoefficientsMin;
 
     /**
      * Creates Simplex instance.
      */
     public Simplex(double[][] constraintVariableCoefficients, double[] constraintConstants,
-                   double[] functionVariableCoefficients) {
+                   double[] objectiveFunctionVariableCoefficients, boolean unrestrictedVariables) {
+        this.unrestrictedVariables = unrestrictedVariables;
         this.constraintVariableCoefficients = constraintVariableCoefficients;
         this.constraintConstants = constraintConstants;
-        this.functionVariableCoefficients = functionVariableCoefficients;
-        setupMin();
-    }
-
-    /**
-     * Manipulates max parameters to create the min version.
-     */
-    private void setupMin() {// Transpose constraintVariableCoefficients
-        int m = constraintVariableCoefficients.length;
-        int n = constraintVariableCoefficients[0].length;
-        constraintVariableCoefficientsMin = new double[n][m];
-        for(int x = 0; x < n; x++) {
-            for(int y = 0; y < m; y++) {
-                constraintVariableCoefficientsMin[x][y] = constraintVariableCoefficients[y][x];
-                if (x >= m - n) {
-                    constraintVariableCoefficientsMin[x][y] = -constraintVariableCoefficientsMin[x][y];
-                }
-            }
-        }
-
-        // Swap constraintConstants and functionVariableCoefficients
-        // Multiply all values by -1
-        constraintConstantsMin = new double[functionVariableCoefficients.length];
-        for(int i = 0; i < constraintConstantsMin.length; i++) {
-            constraintConstantsMin[i] = -functionVariableCoefficients[i];
-        }
-        functionVariableCoefficientsMin = new double[constraintConstants.length];
-        for(int i = 0; i < functionVariableCoefficientsMin.length; i++) {
-            functionVariableCoefficientsMin[i] = -constraintConstants[i];
+        this.objectiveFunctionVariableCoefficients = objectiveFunctionVariableCoefficients;
+        //minimization multiplies objective function by -1
+        this.objectiveFunctionVariableCoefficientsMin = new double[objectiveFunctionVariableCoefficients.length];
+        for (int i = 0; i < objectiveFunctionVariableCoefficientsMin.length; i++) {
+            objectiveFunctionVariableCoefficientsMin[i] = -objectiveFunctionVariableCoefficients[i];
         }
     }
 
@@ -58,15 +35,15 @@ public class Simplex {
         switch (type) {
             case SIMPLEX:
                 max = new TwoPhaseSimplex(constraintVariableCoefficients, constraintConstants,
-                        functionVariableCoefficients);
-                min = new TwoPhaseSimplex(constraintVariableCoefficientsMin, constraintConstantsMin,
-                        functionVariableCoefficientsMin);
+                        objectiveFunctionVariableCoefficients);
+                min = new TwoPhaseSimplex(constraintVariableCoefficients, constraintConstants,
+                        objectiveFunctionVariableCoefficientsMin);
                 break;
             case SIGN_CHANGING_SIMPLEX:
                 max = new TwoPhaseSignChangingSimplex(constraintVariableCoefficients, constraintConstants,
-                        functionVariableCoefficients, true);
-                min = new TwoPhaseSignChangingSimplex(constraintVariableCoefficientsMin, constraintConstantsMin,
-                        functionVariableCoefficientsMin, false);
+                        objectiveFunctionVariableCoefficients, true);
+                min = new TwoPhaseSignChangingSimplex(constraintVariableCoefficients, constraintConstants,
+                        objectiveFunctionVariableCoefficientsMin, false);
                 break;
             case STACKING_SIMPLEX:
                 System.out.println("Stacking Simplex not yet implemented");
@@ -75,9 +52,11 @@ public class Simplex {
                 throw new IllegalArgumentException("Simplex type argument is invalid. Inputted argument: " + type);
         }
 
-        System.out.println("Min: " + min.value());
-        System.out.println("Max: " + max.value());
-        boolean split = min.value() < 0 && max.value() > 0;
+        double minValue = -min.value();
+        double maxValue = max.value();
+        System.out.println("Min: " + minValue);
+        System.out.println("Max: " + maxValue);
+        boolean split = minValue < 0 && maxValue > 0;
         System.out.println("Split: " + split);
     }
 

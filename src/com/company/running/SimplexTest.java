@@ -1,19 +1,96 @@
 package com.company.running;
 
+import static com.company.running.SimplexType.SIGN_CHANGING_SIMPLEX;
+import static com.company.running.SimplexType.SIMPLEX;
+
 /**
  * Runs Simplex over specific parameters to test its usage.
  */
 public class SimplexTest {
 
     public static void main(String[] args) {
+        compareTest();
+    }
 
+    private static void compareTest() {
+        double[] objectiveFunctionConstants = {-3, 2};
+        double[] constraintConstants = {1, 1, 1, 1};
+        double[][] constraintCoefficients = {
+                {1, 0},
+                {0, 1},
+                {-1, 0},
+                {0, -1},
+        };
+        Simplex simplex = new Simplex(constraintCoefficients, constraintConstants, objectiveFunctionConstants, false);
+
+        System.out.println("Simplex:");
+        simplex.run(SIMPLEX);
+        System.out.println("\nSign-Changing Simplex:");
+        simplex.run(SIGN_CHANGING_SIMPLEX);
+
+        System.out.println("\nUnrestricted variables same problem:");
+        double[] objectiveFunctionConstants2 = {-3, 3, 2, -2};
+        double[] constraintConstants2 = {1, 1, 1, 1};
+        double[][] constraintCoefficients2 = {
+                {1, -1, 0, 0},
+                {0, 0, 1, -1},
+                {-1, 1, 0, 0},
+                {0, 0, -1, 1},
+        };
+        Simplex simplex2 = new Simplex(constraintCoefficients2, constraintConstants2, objectiveFunctionConstants2, true);
+
+        System.out.println("Simplex:");
+        simplex2.run(SIMPLEX);
+        System.out.println("\nSign-Changing Simplex:");
+        simplex2.run(SIGN_CHANGING_SIMPLEX);
+
+        System.out.println("\nUnrestricted variables diamond:");
+        double[] objectiveFunctionConstants3 = {-2, 2, 1, -1};
+        double[] constraintConstants3 = {1, 1, 1, 1};
+        double[][] constraintCoefficients3 = {
+                {1, -1, 1, -1},
+                {1, -1, -1, 1},
+                {-1, 1, 1, -1},
+                {-1, 1, -1, 1},
+        };
+        Simplex simplex3 = new Simplex(constraintCoefficients3, constraintConstants3, objectiveFunctionConstants3, true);
+
+        System.out.println("Simplex:");
+        simplex3.run(SIMPLEX);
+        System.out.println("\nSign-Changing Simplex:");
+        simplex3.run(SIGN_CHANGING_SIMPLEX);
+    }
+
+    private static void unrestrictedBoxTest() {
         // maximizing: value = 3 at (1, 1)
-        // function: 2x1 + 1x2
+        // objective function: 2x1 + 1x2
         // constraint 1: 1x1 + 0x2 <= 1
         // constraint 2: 0x1 + 1x2 <= 1
         // constraint 3: 1x1 + 0x2 >= -1  -->  -1x1 + 0x2 <= 1
         // constraint 4: 0x1 + 1x2 >= -1  -->  0x1 + -1x2 <= 1
-        double[] functionConstantsMaxSquare = {  2.0,  1.0  };
+        double[] objectiveFunctionConstantsMaxSquare = {2.0, -2.0, 1.0, -1.0};
+        double[] constraintConstantsMaxSquare = {1.0, 1.0, 1.0, 1.0};
+        double[][] constraintCoefficientsMaxSquare = {
+                {1.0, -1.0, 0.0, 0.0},
+                {0.0, 0.0, 1.0, -1.0},
+                {-1.0, 1.0, 0.0, 0.0},
+                {0.0, 0.0, -1.0, 1.0},
+        };
+        System.out.println("Square around origin max");
+        test(constraintCoefficientsMaxSquare, constraintConstantsMaxSquare, objectiveFunctionConstantsMaxSquare);
+        double[] objectiveFunctionConstantsMinSquare = {-2.0, 2.0, -1.0, 1.0};
+        System.out.println("Square around origin min");
+        test(constraintCoefficientsMaxSquare, constraintConstantsMaxSquare, objectiveFunctionConstantsMinSquare);
+    }
+
+    private static void restrictedBoxTest() {
+        // maximizing: value = 3 at (1, 1)
+        // objective function: 2x1 + 1x2
+        // constraint 1: 1x1 + 0x2 <= 1
+        // constraint 2: 0x1 + 1x2 <= 1
+        // constraint 3: 1x1 + 0x2 >= -1  -->  -1x1 + 0x2 <= 1
+        // constraint 4: 0x1 + 1x2 >= -1  -->  0x1 + -1x2 <= 1
+        double[] objectiveFunctionConstantsMaxSquare = {  -2.0,  -1.0  };
         double[] constraintConstantsMaxSquare = {  1.0, 1.0, 1.0, 1.0  };
         double[][] constraintCoefficientsMaxSquare = {
                 {  1.0, 0.0  },
@@ -22,32 +99,32 @@ public class SimplexTest {
                 {  0.0, -1.0  },
         };
         System.out.println("Square around origin max");
-        test(constraintCoefficientsMaxSquare, constraintConstantsMaxSquare, functionConstantsMaxSquare);
+        test(constraintCoefficientsMaxSquare, constraintConstantsMaxSquare, objectiveFunctionConstantsMaxSquare);
         // results: our xi = simplex xi
 
         // maximizing: value = -3 at (-1, -1)
         // for minimization: transpose matrix:
         //  transpose constraintCoefficients
-        //  swap functionConstants and constraintConstants and multiply both by -1
+        //  swap objectiveFunctionConstants and constraintConstants and multiply both by -1
         double[] constraintConstantsMinSquare = {  -2.0,  -1.0  };
-        double[] functionConstantsMinSquare = {  -1.0, -1.0, -1.0, -1.0  };
+        double[] objectiveFunctionConstantsMinSquare = {  -1.0, -1.0, -1.0, -1.0  };
         double[][] constraintCoefficientsMinSquare = {
                 {  1.0, 0.0, -1.0, 0.0  },
                 {  0.0, 1.0, 0.0, -1.0  },
         };
         System.out.println("Square around origin min");
-        test(constraintCoefficientsMinSquare, constraintConstantsMinSquare, functionConstantsMinSquare);
+        test(constraintCoefficientsMinSquare, constraintConstantsMinSquare, objectiveFunctionConstantsMinSquare);
         // results: our xi = simplex yi * -1
 
 
 
         // maximizing: value = 5 at (2, 1)
-        // function: 2x1 + 1x2
+        // objective function: 2x1 + 1x2
         // constraint 1: 1x1 + 0x2 <= 2
         // constraint 2: 0x1 + 1x2 <= 1
         // constraint 3: 1x1 + 0x2 >= -1  -->  -1x1 + 0x2 <= 1
         // constraint 4: 0x1 + 1x2 >= -2  -->  0x1 + -1x2 <= 2
-        double[] functionConstantsMaxRectangle = {  2.0,  1.0  };
+        double[] objectiveFunctionConstantsMaxRectangle = {  -2.0,  -1.0  };
         double[] constraintConstantsMaxRectangle = {  2.0, 1.0, 1.0, 2.0  };
         double[][] constraintCoefficientsMaxRectangle = {
                 {  1.0, 0.0  },
@@ -56,23 +133,22 @@ public class SimplexTest {
                 {  0.0, -1.0  },
         };
         System.out.println("Rectangle around origin max");
-        test(constraintCoefficientsMaxRectangle, constraintConstantsMaxRectangle, functionConstantsMaxRectangle);
+        test(constraintCoefficientsMaxRectangle, constraintConstantsMaxRectangle, objectiveFunctionConstantsMaxRectangle);
         // results: our xi = simplex xi
 
         // maximizing: value = -4 at (-1, -2)
         // for minimization: transpose matrix:
         //  transpose constraintCoefficients
-        //  swap functionConstants and constraintConstants and multiply both by -1
+        //  swap objectiveFunctionConstants and constraintConstants and multiply both by -1
         double[] constraintConstantsMinRectangle = {  -2.0,  -1.0  };
-        double[] functionConstantsMinRectangle = {  -2.0, -1.0, -1.0, -2.0  };
+        double[] objectiveFunctionConstantsMinRectangle = {  -2.0, -1.0, -1.0, -2.0  };
         double[][] constraintCoefficientsMinRectangle = {
                 {  1.0, 0.0, -1.0, 0.0  },
                 {  0.0, 1.0, 0.0, -1.0  },
         };
         System.out.println("Rectangle around origin min");
-        test(constraintCoefficientsMinRectangle, constraintConstantsMinRectangle, functionConstantsMinRectangle);
+        test(constraintCoefficientsMinRectangle, constraintConstantsMinRectangle, objectiveFunctionConstantsMinRectangle);
         // results: our xi = simplex yi * -1
-
     }
 
     private static void test(double[][] A, double[] b, double[] c) {

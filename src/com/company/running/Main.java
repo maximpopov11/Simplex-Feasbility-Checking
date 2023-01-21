@@ -5,36 +5,36 @@ import java.util.Arrays;
 import static com.company.running.SimplexType.*;
 
 public class Main {
+    // TODO: unrestrict variables
+
     /**
      * Runs minimization and maximization over all Simplex types on the hard-coded input.
      * Default constraints are <= bounds. Implement >= bounds by multiplying both expected sides by -1.
      */
     public static void main(String[] args) {
-        //TODO: BUG: sign changing simplex checks before basic feasible solution is found
-        // (so checks intermediate infeasible solutions at start)
         int NUM_VARIABLES = 5;
         int NUM_INEQUALITIES = 50;
         int DOMAIN_RADIUS = 1;
         int NUM_TESTS = 10;
-        double[] functionCoefficients = generateFunctionCoefficients(NUM_VARIABLES);
-        runRandomTests(functionCoefficients, NUM_INEQUALITIES, DOMAIN_RADIUS, NUM_TESTS);
+        double[] objectiveFunctionCoefficients = generateObjectiveFunctionCoefficients(NUM_VARIABLES);
+        runRandomTests(objectiveFunctionCoefficients, NUM_INEQUALITIES, DOMAIN_RADIUS, NUM_TESTS);
         System.out.println();
         System.out.println();
         System.out.println();
-        runRandomTests(functionCoefficients, NUM_INEQUALITIES, DOMAIN_RADIUS, NUM_TESTS);
+        runRandomTests(objectiveFunctionCoefficients, NUM_INEQUALITIES, DOMAIN_RADIUS, NUM_TESTS);
     }
 
     /**
-     * Generates function coefficients between -100 and 100.
-     * @param numVariables number of variables in function (= dimension).
-     * @return generated function.
+     * Generates objective function coefficients between -100 and 100.
+     * @param numVariables number of variables in objective function (= dimension).
+     * @return generated objective function.
      */
-    private static double[] generateFunctionCoefficients(int numVariables) {
-        double[] function = new double[numVariables];
-        for (int i = 0; i < function.length; i++) {
-            function[i] = Math.random() * 200 - 100;
+    private static double[] generateObjectiveFunctionCoefficients(int numVariables) {
+        double[] objectiveFunction = new double[numVariables];
+        for (int i = 0; i < objectiveFunction.length; i++) {
+            objectiveFunction[i] = Math.random() * 200 - 100;
         }
-        return function;
+        return objectiveFunction;
     }
 
     /**
@@ -84,14 +84,14 @@ public class Main {
 
     /**
      * Generates and runs random tests
-     * @param functionCoefficients coefficients of target function
+     * @param objectiveFunctionCoefficients coefficients of objective function
      * @param numBoundedInequalities number of inequalities to generate
      * @param domainRadius radius of domain bounding circle/sphere/higher dimensional figure centered at origin. This
      *                     must be positive.
      */
-    private static void runRandomTests(double[] functionCoefficients, int numBoundedInequalities, double domainRadius,
+    private static void runRandomTests(double[] objectiveFunctionCoefficients, int numBoundedInequalities, double domainRadius,
                                        int numTests) {
-        int numVariables = functionCoefficients.length;
+        int numVariables = objectiveFunctionCoefficients.length;
         int numBoundaryConstraints = 2 * numVariables;
         int numInequalities = numBoundaryConstraints + numBoundedInequalities;
         double[] constraintConstants = new double[numInequalities];
@@ -99,7 +99,7 @@ public class Main {
         double[][] constraintCoefficients = generateConstraintCoefficients(numVariables, numBoundaryConstraints,
                 numInequalities);
         // TODO: Run many different tests. Currently runs all <= thus has few bounds. Randomizing = likely infeasible.
-        Simplex simplex = new Simplex(constraintCoefficients, constraintConstants, functionCoefficients);
+        Simplex simplex = new Simplex(constraintCoefficients, constraintConstants, objectiveFunctionCoefficients, false);
         runTests(simplex);
     }
 
@@ -111,18 +111,21 @@ public class Main {
         long startTime;
         long endTime;
         long totalTime;
+
         System.out.println("Simplex:");
         startTime = System.nanoTime();
         simplex.run(SIMPLEX);
         endTime = System.nanoTime();
         totalTime = endTime - startTime;
         System.out.println("Time: " + totalTime);
+
         System.out.println("\nSign-Changing Simplex:");
         startTime = System.nanoTime();
         simplex.run(SIGN_CHANGING_SIMPLEX);
         endTime = System.nanoTime();
         totalTime = endTime - startTime;
         System.out.println("Time: " + totalTime);
+
         System.out.println("\nStacking Simplex:");
         startTime = System.nanoTime();
         simplex.run(STACKING_SIMPLEX);
