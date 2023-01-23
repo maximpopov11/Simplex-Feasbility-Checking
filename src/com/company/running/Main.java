@@ -5,64 +5,68 @@ import java.util.Arrays;
 import static com.company.running.SimplexType.*;
 
 public class Main {
-    // TODO: unrestrict variables
-
     /**
-     * Runs minimization and maximization over all Simplex types on the hard-coded input.
-     * Default constraints are <= bounds. Implement >= bounds by multiplying both expected sides by -1.
+     * Runs a batch of tests over a randomly generated function to optimize (max/min) with randomized constraints.
+     * args[0] = number of variables (dimension).
+     * args[1] = number of constraints to generate.
+     * args[2] = side length of the square centered at the origin that generated constraints must intersect.
+     * Variables are unrestricted in sign.
      */
     public static void main(String[] args) {
-        int NUM_VARIABLES = 5;
-        int NUM_INEQUALITIES = 50;
-        int DOMAIN_RADIUS = 1;
-        int NUM_TESTS = 10;
-        double[] objectiveFunctionCoefficients = generateObjectiveFunctionCoefficients(NUM_VARIABLES);
-        runRandomTests(objectiveFunctionCoefficients, NUM_INEQUALITIES, DOMAIN_RADIUS, NUM_TESTS);
-        System.out.println();
-        System.out.println();
-        System.out.println();
-        runRandomTests(objectiveFunctionCoefficients, NUM_INEQUALITIES, DOMAIN_RADIUS, NUM_TESTS);
+        final int NUM_VARIABLES = Integer.parseInt(args[0]);
+        final int NUM_INEQUALITIES = Integer.parseInt(args[1]);
+        final int BOUNDARY_DOMAIN_SQUARE_SIDE_LENGTH = Integer.parseInt(args[2]);
+        runRandomTests(NUM_VARIABLES, NUM_INEQUALITIES, BOUNDARY_DOMAIN_SQUARE_SIDE_LENGTH);
     }
 
-    /**
-     * Generates objective function coefficients between -100 and 100.
-     * @param numVariables number of variables in objective function (= dimension).
-     * @return generated objective function.
-     */
+    private static void runRandomTests(int numVariables, int numBoundedInequalities,
+                                       double boundaryDomainSquareSideLength) {
+        double[] objectiveFunctionCoefficients = generateObjectiveFunctionCoefficients(numVariables);
+        int numBoundaryConstraints = 2 * numVariables;
+        int numInequalities = numBoundaryConstraints + numBoundedInequalities;
+        double[] constraintConstants = new double[numInequalities];
+        Arrays.fill(constraintConstants, boundaryDomainSquareSideLength/2);
+        double[][] constraintCoefficients = generateConstraintCoefficients(numVariables, numBoundaryConstraints,
+                numInequalities);
+
+        // TODO: Run many different tests:
+        //  All combinations of </>: multiply both sides by -1
+        //  Catch and ignore infeasible solutions
+        Simplex simplex = new Simplex(constraintCoefficients, constraintConstants, objectiveFunctionCoefficients, false);
+        runTest(simplex);
+    }
+
     private static double[] generateObjectiveFunctionCoefficients(int numVariables) {
-        double[] objectiveFunction = new double[numVariables];
-        for (int i = 0; i < objectiveFunction.length; i++) {
-            objectiveFunction[i] = Math.random() * 200 - 100;
+        double[] objectiveFunction = new double[2*numVariables];
+        for (int i = 0; i < objectiveFunction.length; i+=2) {
+            objectiveFunction[i] = Math.random() - 0.5;
+            // allows for unrestricted (+/-) variables
+            objectiveFunction[i+1] = -objectiveFunction[i];
         }
         return objectiveFunction;
     }
 
-    /**
-     * Generates constraint constants for inequalities.
-     * @param numVariables number of variables (dimension).
-     * @param numBoundaryConstraints number of boundary constraints (defining domain).
-     * @param numInequalities number of inequalities to generate.
-     * @return generated constraint coefficients.
-     */
     private static double[][] generateConstraintCoefficients(int numVariables, int numBoundaryConstraints,
                                                              int numInequalities) {
-        double[][] constraintCoefficients = new double[numInequalities][numVariables];
+        double[][] constraintCoefficients = new double[numInequalities][2*numVariables];
+        // set up square domain boundary constraints
         for (int i = 0; i < numVariables; i++) {
-            double[] boundaryConstraintPositive = new double[numVariables];
-            boundaryConstraintPositive[i] = 1;
-            double[] boundaryConstraintNegative = new double[numVariables];
-            boundaryConstraintNegative[i] = -1;
+            double[] boundaryConstraintPositive = new double[2*numVariables];
+            boundaryConstraintPositive[2*i] = 1;
+            boundaryConstraintPositive[2*i+1] = -1;
+            double[] boundaryConstraintNegative = new double[2*numVariables];
+            boundaryConstraintNegative[2*i] = -1;
+            boundaryConstraintNegative[2*i+1] = 1;
             constraintCoefficients[2*i] = boundaryConstraintPositive;
             constraintCoefficients[2*i+1] = boundaryConstraintNegative;
         }
-        // We can prove that the set of all equations that fit inside the circle (or higher dimensional figure) defined
-        // by the given radius is equal to the set of all equations a^2 + b^2 + ... > 1 for d > 0 and when at least one
-        // coefficient ≠ 0.
-        // Thus, we generate a series of inequalities in a subset of the legal equations where the coefficients are all
-        // > 0.
+        // We can prove that the set of all equations that fit inside the circle (or higher dimensional figure)
+        // inscribed by the square domain boundary is equal to the set of all equations a^2 + b^2 + ... > 1 for d > 0
+        // and when at least one coefficient ≠ 0. Thus, we generate a series of inequalities in a subset of the legal
+        // equations where the coefficients are all > 0.
         for (int i = numBoundaryConstraints; i < constraintCoefficients.length; i++) {
-            double[] singleConstraintCoefficients = new double[numVariables];
-            for (int j = 0; j < singleConstraintCoefficients.length; j++) {
+            double[] singleConstraintCoefficients = new double[2*numVariables];
+            for (int j = 0; j < numVariables; j++) {
                 // find random value > 1 to ensure legality (losing possibility for some legal equations)
                 double coefficient = 0;
                 while (coefficient == 0) {
@@ -75,7 +79,8 @@ public class Main {
                 if (Math.random() < 0.5) {
                     coefficient *= -1;
                 }
-                singleConstraintCoefficients[j] = coefficient;
+                singleConstraintCoefficients[2*j] = coefficient;
+                singleConstraintCoefficients[2*j+1] = -coefficient;
             }
             constraintCoefficients[i] = singleConstraintCoefficients;
         }
@@ -83,31 +88,11 @@ public class Main {
     }
 
     /**
-     * Generates and runs random tests
-     * @param objectiveFunctionCoefficients coefficients of objective function
-     * @param numBoundedInequalities number of inequalities to generate
-     * @param domainRadius radius of domain bounding circle/sphere/higher dimensional figure centered at origin. This
-     *                     must be positive.
-     */
-    private static void runRandomTests(double[] objectiveFunctionCoefficients, int numBoundedInequalities, double domainRadius,
-                                       int numTests) {
-        int numVariables = objectiveFunctionCoefficients.length;
-        int numBoundaryConstraints = 2 * numVariables;
-        int numInequalities = numBoundaryConstraints + numBoundedInequalities;
-        double[] constraintConstants = new double[numInequalities];
-        Arrays.fill(constraintConstants, domainRadius);
-        double[][] constraintCoefficients = generateConstraintCoefficients(numVariables, numBoundaryConstraints,
-                numInequalities);
-        // TODO: Run many different tests. Currently runs all <= thus has few bounds. Randomizing = likely infeasible.
-        Simplex simplex = new Simplex(constraintCoefficients, constraintConstants, objectiveFunctionCoefficients, false);
-        runTests(simplex);
-    }
-
-    /**
      * Runs simplex variations on given simplex and gathers data
      * @param simplex simplex (tableau) instance to run simplex variations over
      */
-    private static void runTests(Simplex simplex){
+    private static void runTest(Simplex simplex){
+        // TODO: add up results
         long startTime;
         long endTime;
         long totalTime;
